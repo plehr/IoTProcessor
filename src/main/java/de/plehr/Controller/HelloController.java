@@ -1,4 +1,4 @@
-package de.plehr;
+package de.plehr.Controller;
 
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
