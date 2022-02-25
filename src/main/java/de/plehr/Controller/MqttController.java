@@ -1,5 +1,6 @@
 package de.plehr.Controller;
 
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -7,6 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import de.plehr.MqttSubscriberImpl;
 import de.plehr.Exception.ForbiddenException;
+import de.plehr.Model.ConnectionOffer;
 import de.plehr.Model.MqttUser;
 
 /**
@@ -15,6 +17,11 @@ import de.plehr.Model.MqttUser;
 @RestController
 @RequestMapping("/mqtt")
 public class MqttController {
+
+  @GetMapping()
+  public ConnectionOffer getEndpoint() {
+      return new ConnectionOffer();
+  }
 
   /**
    * Allow user to connect to the MQTT broker.
