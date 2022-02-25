@@ -2,11 +2,13 @@ package de.plehr;
 
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 
+import de.plehr.Model.ConnectionOffer;
+
 public abstract class MqttConfig {
-    protected final String broker = System.getenv("MQTT_BROKER_URL");
+    protected final String broker = new ConnectionOffer().hostname;
     protected final int qos = Integer.parseInt(System.getenv("MQTT_QOS"));
-    protected Boolean hasSSL = Boolean.parseBoolean(System.getenv("MQTT_BROKER_URL"));
-    protected Integer port = Integer.parseInt(System.getenv("MQTT_BROKER_PORT"));
+    protected Boolean hasSSL = new ConnectionOffer().ssl;
+    protected Integer port = new ConnectionOffer().port;
     protected final String userName = System.getenv("MQTT_USER");
     protected final String password = System.getenv("MQTT_PASS");
     protected final String TCP = "tcp://";
