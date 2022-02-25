@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import de.plehr.MqttSubscriberImpl;
 import de.plehr.Exception.ForbiddenException;
 import de.plehr.Model.MqttUser;
 
@@ -42,9 +43,12 @@ public class MqttController {
   @PostMapping(value = "/acl", consumes = "application/json", produces = "application/json")
   public void checkAcl(@RequestBody MqttUser person) {
     System.out.println("Acl-Request: " + person);
-    if (person.canWrite())
-      return;
+    if (!person.canWrite())
     throw new ForbiddenException();
+    if (person.canWrite() && !person.isAdmin())
+    {
+      MqttSubscriberImpl i = new MqttSubscriberImpl();
+        i.subscribeMessage(person.getUsername() + "/#");
+    }
   }
-
 }
