@@ -11,7 +11,7 @@ public class MqttMessageListener implements Runnable {
     @Override
     public void run() {
         while (true) {
-            subscriber.subscribeMessage("test");
+            subscriber.subscribeMessage("#");
         }
     }
 }
