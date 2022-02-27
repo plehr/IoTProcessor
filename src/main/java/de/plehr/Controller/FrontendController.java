@@ -2,15 +2,15 @@ package de.plehr.Controller;
 
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+
 import org.springframework.stereotype.Controller;
 
 @Controller
-public class HelloController {
+public class FrontendController {
 
     @GetMapping("/")
-    String hello(Model m) {
+    String firstPage(Model m) {
         m.addAttribute("hello", "Helloo World!");
-        return "hello";
+        return "firstPage";
     }
-
 }
