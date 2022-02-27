@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class MqttMessageListener implements Runnable {
     @Autowired
-    MqttSubscriberImpl subscriber;
+    MqttCommunicator subscriber;
 
     @Override
     public void run() {

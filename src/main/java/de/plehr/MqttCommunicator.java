@@ -8,7 +8,7 @@ import org.eclipse.paho.client.mqttv3.persist.*;
 import org.springframework.stereotype.Component;
 
 @Component
-public class MqttSubscriberImpl extends MqttConfig implements MqttCallback {
+public class MqttCommunicator extends MqttConfig implements MqttCallback {
 
     private String brokerUrl = null;
     final private String colon = ":";
@@ -18,9 +18,14 @@ public class MqttSubscriberImpl extends MqttConfig implements MqttCallback {
     private MqttConnectOptions connectionOptions = null;
     private MemoryPersistence persistence = null;
 
-    public MqttSubscriberImpl() {
+    public MqttCommunicator() {
         System.out.println("MQTT configuration loaded");
         this.config();
+    }
+
+    public MqttCommunicator(String topic){
+        this();
+        subscribeMessage(topic);
     }
 
     @Override
@@ -75,6 +80,13 @@ public class MqttSubscriberImpl extends MqttConfig implements MqttCallback {
         } catch (MqttException me) {
             System.out.println("MQTT not able to read topic  " + topic);
         }
+    }
+
+    public void sendMessage(String message, String topic) throws MqttPersistenceException, MqttException{
+            System.out.println("Publishing message: " + message);
+            MqttMessage m = new MqttMessage(message.getBytes());
+            m.setQos(this.qos);
+            this.mqttClient.publish(topic, m);
     }
 
     @Override

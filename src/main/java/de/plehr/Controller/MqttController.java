@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import de.plehr.MqttSubscriberImpl;
+import de.plehr.MqttCommunicator;
 import de.plehr.Exception.ForbiddenException;
 import de.plehr.Model.ConnectionOffer;
 import de.plehr.Model.MqttUser;
@@ -53,9 +53,6 @@ public class MqttController {
     if (!person.canWrite())
     throw new ForbiddenException();
     if (person.canWrite() && !person.isAdmin())
-    {
-      MqttSubscriberImpl i = new MqttSubscriberImpl();
-        i.subscribeMessage(person.getUsername() + "/#");
-    }
+      new MqttCommunicator(person.getUsername() + "/#");
   }
 }
