@@ -5,10 +5,17 @@ import java.util.UUID;
 
 import org.eclipse.paho.client.mqttv3.*;
 import org.eclipse.paho.client.mqttv3.persist.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import de.plehr.Model.DataEntry;
+import de.plehr.Repository.EntryRepository;
 
 @Component
 public class MqttCommunicator extends MqttConfig implements MqttCallback {
+
+    @Autowired
+    EntryRepository entryRepository;
 
     private String brokerUrl = null;
     final private String colon = ":";
@@ -23,7 +30,7 @@ public class MqttCommunicator extends MqttConfig implements MqttCallback {
         this.config();
     }
 
-    public MqttCommunicator(String topic){
+    public MqttCommunicator(String topic) {
         this();
         subscribeMessage(topic);
     }
@@ -78,15 +85,15 @@ public class MqttCommunicator extends MqttConfig implements MqttCallback {
         try {
             this.mqttClient.subscribe(topic, this.qos);
         } catch (MqttException me) {
-            System.out.println("MQTT not able to read topic  " + topic);
+            System.out.println("MQTT not able to read topic  " + topic + "( " + me.getMessage() + ")");
         }
     }
 
-    public void sendMessage(String message, String topic) throws MqttPersistenceException, MqttException{
-            System.out.println("Publishing message: " + message);
-            MqttMessage m = new MqttMessage(message.getBytes());
-            m.setQos(this.qos);
-            this.mqttClient.publish(topic, m);
+    public void sendMessage(String message, String topic) throws MqttPersistenceException, MqttException {
+        System.out.println("Publishing message: " + message);
+        MqttMessage m = new MqttMessage(message.getBytes());
+        m.setQos(this.qos);
+        this.mqttClient.publish(topic, m);
     }
 
     @Override
@@ -101,9 +108,14 @@ public class MqttCommunicator extends MqttConfig implements MqttCallback {
     @Override
     public void messageArrived(String mqttTopic, MqttMessage mqttMessage) throws Exception {
         String time = new Timestamp(System.currentTimeMillis()).toString();
+        String message = new String(mqttMessage.getPayload());
+        String source = mqttTopic.substring(0, mqttTopic.indexOf("/"));
+        String topic = mqttTopic.substring(mqttTopic.indexOf("/") + 1, mqttTopic.length());
+
         System.out.println("***********************************************************************");
         System.out.println("MQTT Message Arrived at Time: " + time + "  Topic: " + mqttTopic + "  Message: "
-                + new String(mqttMessage.getPayload()));
+                + message);
+        entryRepository.save(new DataEntry(source, topic, message, Timestamp.valueOf(time)));
     }
 
     @Override
