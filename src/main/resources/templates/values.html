@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8" />
+    <title></title>
+</head>
+
+<body>
+    <table style="width:100%">
+        <tr th:each="entry : ${valuelist}">
+            <td><span th:text="${entry.source}"> Source </span></td>
+            <td><span th:text="${entry.topic}"> Topic </span></td>
+            <td><span th:text="${entry.value}"> Value </span></td>
+        </tr>
+    </table>
+</body>
+
+</html>
