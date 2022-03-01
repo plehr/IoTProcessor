@@ -33,13 +33,4 @@ public class App extends SpringBootServletInitializer {
    protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
       return application.sources(App.class);
    }
-
-   @Bean
-   public CommandLineRunner schedulingRunner(TaskExecutor executor) {
-      return new CommandLineRunner() {
-         public void run(String... args) throws Exception {
-            executor.execute(MessageListener);
-         }
-      };
-   }
 }
