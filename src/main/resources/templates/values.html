@@ -22,57 +22,67 @@
 </head>
 
 <body class="">
-        <div class="wrapper">
+    <div class="wrapper">
 
-            <section class="content-header">
-                <div class="container-fluid">
-                    <div class="row mb-2">
-                        <div class="col-sm-6">
-                            <h1>Sensordaten</h1>
-                        </div>
-                        <div class="col-sm-6">
-                            <ol class="breadcrumb float-sm-right">
-                                <li class="breadcrumb-item"><a href="/">Home</a></li>
-                                <li class="breadcrumb-item active">Sensordaten</li>
-                            </ol>
-                        </div>
+        <section class="content-header">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                    <div class="col-sm-6">
+                        <h1>Sensordaten</h1>
+                    </div>
+                    <div class="col-sm-6">
+                        <ol class="breadcrumb float-sm-right">
+                            <li class="breadcrumb-item"><a href="/">Home</a></li>
+                            <li class="breadcrumb-item active">Sensordaten</li>
+                        </ol>
                     </div>
                 </div>
-            </section>
+            </div>
+        </section>
 
-            <section class="content">
-                <div class="container-fluid">
-                    <div class="row">
-                        <div class="col-12">
-                            <div class="card">
-                                <div class="card-header">
-                                    <h3 class="card-title">Sensordaten</h3>
-                                </div>
+        <section class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">Sensordaten</h3>
+                            </div>
 
-                                <div class="card-body">
-                                    <table id="example1" class="table table-bordered table-striped">
-                                        <thead>
-                                            <tr>
-                                                <th>Source</th>
-                                                <th>Topic</th>
-                                                <th>Value</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr th:each="entry : ${valuelist}">
-                                                <td><a th:href="@{'/source/' + ${entry.source}}" class="text-reset"><span th:text="${entry.source}"> Source </span></a></td>
-                                                <td><a th:href="@{'/topic/' + ${entry.topic}}" class="text-reset"><span th:text="${entry.topic}"> Topic </span></a></td>
-                                                <td><span th:text="${entry.value}"> Value </span></td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
+                            <div class="card-body">
+                                <div class="alert alert-warning alert-dismissible fade show" role="alert"
+                                    th:if="${filtertype}">
+                                    Filter on field <strong><span th:text="${filtertype}"></span></strong> enabled with
+                                    value: <strong><span th:text="${filtervalue}"></span></strong>
+                                    <a href="/values"><button type="button" class="close"  aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button></a>
                                 </div>
+                                <table id="example1" class="table table-bordered table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Source</th>
+                                            <th>Topic</th>
+                                            <th>Value</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr th:each="entry : ${valuelist}">
+                                            <td><a th:href="@{'/source/' + ${entry.source}}" class="text-reset"><span
+                                                        th:text="${entry.source}"> Source </span></a></td>
+                                            <td><a th:href="@{'/topic/' + ${entry.topic}}" class="text-reset"><span
+                                                        th:text="${entry.topic}"> Topic </span></a></td>
+                                            <td><span th:text="${entry.value}"> Value </span></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
                     </div>
                 </div>
-            </section>
-        </div>
+            </div>
+        </section>
+    </div>
 
     <script th:src="@{/webjars/AdminLTE/3.2.0/plugins/jquery/jquery.min.js}"></script>
     <script th:src="@{/webjars/AdminLTE/3.2.0/plugins/bootstrap/js/bootstrap.bundle.min.js}"></script>
