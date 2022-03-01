@@ -1,13 +1,57 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
 <head>
-    <meta charset="UTF-8" />
-    <title></title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>IoTProcessorBackend | Error</title>
+
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+    <link th:rel="stylesheet" th:href="@{/webjars/AdminLTE/3.2.0/plugins/fontawesome-free/css/all.min.css} " />
+    <link th:rel="stylesheet" th:href="@{/webjars/AdminLTE/3.2.0/plugins/icheck-bootstrap/icheck-bootstrap.min.css} ">
+    <link th:rel="stylesheet" th:href="@{/webjars/AdminLTE/3.2.0/dist/css/adminlte.min.css} " />
 </head>
-<body>
-    <h1>Error <span th:text="${errorcode}">200</span></h1>
-<p>
-    <span th:text="${errormessage}">Alle gut!</span>
-</p>
+
+<body class="hold-transition sidebar-mini">
+    <div class="wrapper">
+        <div class="content-wrapper">
+            <section class="content-header">
+                <div class="container-fluid">
+                    <div class="row mb-2">
+                        <div class="col-sm-6">
+                            <h1><span th:text="${errorcode}">Alle gut!</span> Error Page</h1>
+                        </div>
+                        <div class="col-sm-6">
+                            <ol class="breadcrumb float-sm-right">
+                                <li class="breadcrumb-item"><a href="#">Home</a></li>
+                                <li class="breadcrumb-item active" th:text="${errorcode}">500 Error Page</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <section class="content">
+                <div class="error-page">
+                    <h2 class="headline text-danger" th:text="${errorcode}">500</h2>
+                    <div class="error-content">
+                        <h3><i class="fas fa-exclamation-triangle text-danger"></i> Oops! Something went wrong.</h3>
+                        <p>
+                            We will work on fixing that right away.
+                            Meanwhile, you may <a href="/">return to dashboard</a> or try using the
+                            search form.
+                        </p>
+                        <p>Errorcode: <span th:text="${errorcode}">Alle gut!</span><span th:text="${errormessage}">Alle
+                                gut!</span></p>
+                    </div>
+                </div>
+
+            </section>
+        </div>
+    </div>
+    <script th:src="@{/webjars/AdminLTE/3.2.0/plugins/jquery/jquery.min.js}"></script>
+    <script th:src="@{/webjars/AdminLTE/3.2.0/plugins/bootstrap/js/bootstrap.bundle.min.js}"></script>
+    <script th:src="@{/webjars/AdminLTE/3.2.0/dist/js/adminlte.min.js}"></script>
 </body>
+
 </html>
