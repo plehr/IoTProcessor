@@ -8,6 +8,7 @@ import org.eclipse.paho.client.mqttv3.persist.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import de.plehr.Model.ConnectionOffer;
 import de.plehr.Model.DataEntry;
 import de.plehr.Repository.EntryRepository;
 
@@ -18,8 +19,7 @@ public class MqttCommunicator extends MqttConfig implements MqttCallback {
     EntryRepository entryRepository;
 
     private String brokerUrl = null;
-    final private String colon = ":";
-    final private String clientId = UUID.randomUUID().toString();
+    final private String clientId = "Server " + UUID.randomUUID().toString();
 
     private MqttClient mqttClient = null;
     private MqttConnectOptions connectionOptions = null;
@@ -44,17 +44,15 @@ public class MqttCommunicator extends MqttConfig implements MqttCallback {
     @Override
     protected void config(String broker, Integer port, Boolean ssl, Boolean withUserNamePass) {
         System.out.println("MQTT inside load parameter");
-        String protocal = this.TCP;
 
-        this.brokerUrl = protocal + this.broker + colon + port;
         this.persistence = new MemoryPersistence();
         this.connectionOptions = new MqttConnectOptions();
 
         try {
-            this.mqttClient = new MqttClient(brokerUrl, clientId, persistence);
+            this.mqttClient = new MqttClient(new ConnectionOffer().connectUrlSecure, clientId, persistence);
             this.connectionOptions.setCleanSession(true);
-            this.connectionOptions.setPassword(this.password.toCharArray());
-            this.connectionOptions.setUserName(this.userName);
+            this.connectionOptions.setPassword(ConnectionOffer.password.toCharArray());
+            this.connectionOptions.setUserName(ConnectionOffer.username);
             this.mqttClient.connect(this.connectionOptions);
             this.mqttClient.setCallback(this);
         } catch (MqttException me) {
@@ -65,14 +63,14 @@ public class MqttCommunicator extends MqttConfig implements MqttCallback {
     @Override
     protected void config() {
         System.out.println("MQTT inside config with parameter");
-        this.brokerUrl = this.TCP + this.broker + colon + this.port;
+        this.brokerUrl = new ConnectionOffer().connectUrlSecure;
         this.persistence = new MemoryPersistence();
         this.connectionOptions = new MqttConnectOptions();
         try {
             this.mqttClient = new MqttClient(brokerUrl, clientId, persistence);
             this.connectionOptions.setCleanSession(true);
-            this.connectionOptions.setPassword(this.password.toCharArray());
-            this.connectionOptions.setUserName(this.userName);
+            this.connectionOptions.setPassword(ConnectionOffer.password.toCharArray());
+            this.connectionOptions.setUserName(ConnectionOffer.username);
             this.mqttClient.connect(this.connectionOptions);
             this.mqttClient.setCallback(this);
         } catch (MqttException me) {

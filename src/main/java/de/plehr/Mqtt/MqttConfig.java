@@ -5,6 +5,7 @@ import org.eclipse.paho.client.mqttv3.MqttMessage;
 import de.plehr.Model.ConnectionOffer;
 
 public abstract class MqttConfig {
+    /*
     protected final String broker = new ConnectionOffer().hostname;
     protected final int qos = Integer.parseInt(System.getenv("MQTT_QOS"));
     protected Boolean hasSSL = new ConnectionOffer().ssl;
@@ -13,6 +14,9 @@ public abstract class MqttConfig {
     protected final String password = System.getenv("MQTT_PASS");
     protected final String TCP = "tcp://";
     protected final String SSL = "ssl://";
+    */
+    protected final int qos = 1;
+
 
     /**
      * Custom Configuration
