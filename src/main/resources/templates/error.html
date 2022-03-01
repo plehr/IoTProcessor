@@ -15,39 +15,37 @@
 
 <body class="hold-transition sidebar-mini">
     <div class="wrapper">
-        <div class="content-wrapper">
-            <section class="content-header">
-                <div class="container-fluid">
-                    <div class="row mb-2">
-                        <div class="col-sm-6">
-                            <h1><span th:text="${errorcode}">Alle gut!</span> Error Page</h1>
-                        </div>
-                        <div class="col-sm-6">
-                            <ol class="breadcrumb float-sm-right">
-                                <li class="breadcrumb-item"><a href="#">Home</a></li>
-                                <li class="breadcrumb-item active" th:text="${errorcode}"></li>
-                            </ol>
-                        </div>
+        <section class="content-header">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                    <div class="col-sm-6">
+                        <h1><span th:text="${errorcode}">Alle gut!</span> Error Page</h1>
+                    </div>
+                    <div class="col-sm-6">
+                        <ol class="breadcrumb float-sm-right">
+                            <li class="breadcrumb-item"><a href="#">Home</a></li>
+                            <li class="breadcrumb-item active" th:text="${errorcode}"></li>
+                        </ol>
                     </div>
                 </div>
-            </section>
-            <section class="content">
-                <div class="error-page">
-                    <h2 class="headline text-danger" th:text="${errorcode}">500</h2>
-                    <div class="error-content">
-                        <h3><i class="fas fa-exclamation-triangle text-danger"></i> Oops! Something went wrong.</h3>
-                        <p>
-                            We will work on fixing that right away.
-                            Meanwhile, you may <a href="/">return to dashboard</a> or try using the
-                            search form.
-                        </p>
-                        <p>Errorcode: <span th:text="${errorcode}">Alle gut!</span><span th:text="${errormessage}">Alle
-                                gut!</span></p>
-                    </div>
+            </div>
+        </section>
+        <section class="content">
+            <div class="error-page">
+                <h2 class="headline text-danger" th:text="${errorcode}">500</h2>
+                <div class="error-content">
+                    <h3><i class="fas fa-exclamation-triangle text-danger"></i> Oops! Something went wrong.</h3>
+                    <p>
+                        We will work on fixing that right away.
+                        Meanwhile, you may <a href="/">return to dashboard</a> or try using the
+                        search form.
+                    </p>
+                    <p>Errorcode: <span th:text="${errorcode}">Alle gut!</span><span th:text="${errormessage}">Alle
+                            gut!</span></p>
                 </div>
+            </div>
 
-            </section>
-        </div>
+        </section>
     </div>
     <script th:src="@{/webjars/AdminLTE/3.2.0/plugins/jquery/jquery.min.js}"></script>
     <script th:src="@{/webjars/AdminLTE/3.2.0/plugins/bootstrap/js/bootstrap.bundle.min.js}"></script>
