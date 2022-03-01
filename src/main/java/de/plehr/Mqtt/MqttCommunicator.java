@@ -1,4 +1,4 @@
-package de.plehr;
+package de.plehr.Mqtt;
 
 import java.sql.Timestamp;
 import java.util.UUID;

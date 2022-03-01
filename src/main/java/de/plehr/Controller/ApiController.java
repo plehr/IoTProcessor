@@ -7,9 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import de.plehr.MqttCommunicator;
 import de.plehr.Repository.EntryRepository;
 import de.plehr.Model.DataEntry;
+import de.plehr.Mqtt.MqttCommunicator;
 
 @RestController
 @RequestMapping("/api")

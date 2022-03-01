@@ -6,10 +6,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import de.plehr.MqttCommunicator;
 import de.plehr.Exception.ForbiddenException;
 import de.plehr.Model.ConnectionOffer;
 import de.plehr.Model.MqttUser;
+import de.plehr.Mqtt.MqttCommunicator;
 
 /**
  * Controller for the communication with the MQTT broker.

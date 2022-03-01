@@ -1,4 +1,4 @@
-package de.plehr;
+package de.plehr.Mqtt;
 
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 
