@@ -17,12 +17,11 @@ public class App extends SpringBootServletInitializer {
 
    public static void main(String[] args) {
       try {
-         System.getenv("MQTT_BROKER_URL");
-         Integer.parseInt(System.getenv("MQTT_QOS"));
-         Boolean.parseBoolean(System.getenv("MQTT_BROKER_URL")); /* By default SSL is disabled */
-         Integer.parseInt(System.getenv("MQTT_BROKER_PORT"));
-         System.getenv("MQTT_USER");
-         System.getenv("MQTT_PASS");
+         System.getenv("CLEARDB_DATABASE_URL");
+         System.getenv("STACKHERO_MOSQUITTO_URL_CLEAR");
+         System.getenv("STACKHERO_MOSQUITTO_URL_TLS");
+         System.getenv("STACKHERO_MOSQUITTO_USER_LOGIN");
+         System.getenv("STACKHERO_MOSQUITTO_USER_PASSWORD");
       } catch (Exception ex) {
          System.err.println("Invalid enviroment variables");
       }
