@@ -49,7 +49,7 @@ public class MqttCommunicator extends MqttConfig implements MqttCallback {
         this.connectionOptions = new MqttConnectOptions();
 
         try {
-            this.mqttClient = new MqttClient(new ConnectionOffer().connectUrlSecure, clientId, persistence);
+            this.mqttClient = new MqttClient(new ConnectionOffer().connectUrl, clientId, persistence);
             this.connectionOptions.setCleanSession(true);
             this.connectionOptions.setPassword(ConnectionOffer.password.toCharArray());
             this.connectionOptions.setUserName(ConnectionOffer.username);
@@ -63,7 +63,7 @@ public class MqttCommunicator extends MqttConfig implements MqttCallback {
     @Override
     protected void config() {
         System.out.println("MQTT inside config with parameter");
-        this.brokerUrl = new ConnectionOffer().connectUrlSecure;
+        this.brokerUrl = new ConnectionOffer().connectUrl;
         this.persistence = new MemoryPersistence();
         this.connectionOptions = new MqttConnectOptions();
         try {
