@@ -82,6 +82,7 @@ public class MqttCommunicator extends MqttConfig implements MqttCallback {
     public void subscribeMessage(String topic) {
         try {
             this.mqttClient.subscribe(topic, this.qos);
+            System.out.println("MQTT subscribed to " + topic);
         } catch (MqttException me) {
             System.out.println("MQTT not able to read topic  " + topic + "( " + me.getMessage() + ")");
         }
