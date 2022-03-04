@@ -21,7 +21,7 @@ public class MainConfig {
         String dbUrl = "jdbc:mysql://" + dbUri.getHost() + dbUri.getPath();
 
         DataSourceBuilder dataSourceBuilder = DataSourceBuilder.create();
-        dataSourceBuilder.driverClassName("org.h2.Driver");
+        dataSourceBuilder.driverClassName("com.mysql.cj.jdbc.Driver");
         dataSourceBuilder.url(dbUrl);
         dataSourceBuilder.username(username);
         dataSourceBuilder.password(password);

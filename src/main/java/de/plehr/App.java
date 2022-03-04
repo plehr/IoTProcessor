@@ -12,9 +12,6 @@ import org.springframework.core.task.TaskExecutor;
 @SpringBootApplication
 public class App extends SpringBootServletInitializer {
 
-   @Autowired
-   Runnable MessageListener;
-
    public static void main(String[] args) {
       try {
          System.getenv("CLEARDB_DATABASE_URL");
