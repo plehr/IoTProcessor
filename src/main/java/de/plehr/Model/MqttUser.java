@@ -50,8 +50,8 @@ public class MqttUser {
      * @throws IllegalArgumentException if username is not valid
      */
     public void setUsername(String username) throws IllegalArgumentException {
-        if (!username.matches("^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$") && !username.contains("_adm"))
-            throw new IllegalArgumentException("Invalid MAC address");
+        if (!username.matches("^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$") && !username.contains("_adm") && !username.contains("admin"))
+            throw new IllegalArgumentException("Invalid MAC address User: " + username);
         this.username = username;
     }
 

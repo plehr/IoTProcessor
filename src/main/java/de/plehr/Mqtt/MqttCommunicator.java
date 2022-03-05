@@ -1,7 +1,6 @@
 package de.plehr.Mqtt;
 
 import java.sql.Timestamp;
-import java.util.UUID;
 
 import org.eclipse.paho.client.mqttv3.*;
 import org.eclipse.paho.client.mqttv3.persist.*;
@@ -17,9 +16,7 @@ public class MqttCommunicator extends MqttConfig implements MqttCallback {
 
     @Autowired
     EntryRepository entryRepository;
-
-    private String brokerUrl = null;
-    final private String clientId = "Server " + UUID.randomUUID().toString();
+    private String brokerUrl = new ConnectionOffer().connectUrl;
 
     private MqttClient mqttClient = null;
     private MqttConnectOptions connectionOptions = null;
@@ -37,44 +34,40 @@ public class MqttCommunicator extends MqttConfig implements MqttCallback {
 
     @Override
     public void connectionLost(Throwable cause) {
-        System.out.println("MQTT connection Lost" + cause);
+        System.out.println("MQTT connection lost: " + cause);
         this.config();
     }
 
     @Override
     protected void config(String broker, Integer port, Boolean ssl, Boolean withUserNamePass) {
-        System.out.println("MQTT inside load parameter");
-
         this.persistence = new MemoryPersistence();
         this.connectionOptions = new MqttConnectOptions();
-
         try {
-            this.mqttClient = new MqttClient(new ConnectionOffer().connectUrl, clientId, persistence);
+            this.mqttClient = new MqttClient(broker, MqttClient.generateClientId(), persistence);
             this.connectionOptions.setCleanSession(true);
             this.connectionOptions.setPassword(ConnectionOffer.password.toCharArray());
             this.connectionOptions.setUserName(ConnectionOffer.username);
             this.mqttClient.connect(this.connectionOptions);
             this.mqttClient.setCallback(this);
         } catch (MqttException me) {
-            throw new RuntimeException("MQTT not Connected");
+            throw new RuntimeException("MQTT not connected");
         }
     }
 
     @Override
     protected void config() {
-        System.out.println("MQTT inside config with parameter");
         this.brokerUrl = new ConnectionOffer().connectUrl;
         this.persistence = new MemoryPersistence();
         this.connectionOptions = new MqttConnectOptions();
         try {
-            this.mqttClient = new MqttClient(brokerUrl, clientId, persistence);
+            this.mqttClient = new MqttClient(brokerUrl, MqttClient.generateClientId(), persistence);
             this.connectionOptions.setCleanSession(true);
             this.connectionOptions.setPassword(ConnectionOffer.password.toCharArray());
             this.connectionOptions.setUserName(ConnectionOffer.username);
             this.mqttClient.connect(this.connectionOptions);
             this.mqttClient.setCallback(this);
         } catch (MqttException me) {
-            throw new RuntimeException("MQTT not Connected");
+            throw new RuntimeException("MQTT not connected");
         }
     }
 
@@ -110,10 +103,9 @@ public class MqttCommunicator extends MqttConfig implements MqttCallback {
         String message = new String(mqttMessage.getPayload());
         String source = mqttTopic.substring(0, mqttTopic.indexOf("/"));
         String topic = mqttTopic.substring(mqttTopic.indexOf("/") + 1, mqttTopic.length());
-
-        System.out.println("***********************************************************************");
         System.out.println("MQTT Message Arrived at Time: " + time + "  Topic: " + mqttTopic + "  Message: "
                 + message);
+        if (!message.contains("test") && message.length() >1)
         entryRepository.save(new DataEntry(source, topic, message, Timestamp.valueOf(time)));
     }
 
