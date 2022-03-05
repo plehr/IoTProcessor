@@ -12,16 +12,10 @@ import org.springframework.core.task.TaskExecutor;
 @SpringBootApplication
 public class App extends SpringBootServletInitializer {
 
+   @Autowired
+   Runnable MessageListener;
+   
    public static void main(String[] args) {
-      try {
-         System.getenv("CLEARDB_DATABASE_URL");
-         System.getenv("STACKHERO_MOSQUITTO_URL_CLEAR");
-         System.getenv("STACKHERO_MOSQUITTO_URL_TLS");
-         System.getenv("STACKHERO_MOSQUITTO_USER_LOGIN");
-         System.getenv("STACKHERO_MOSQUITTO_USER_PASSWORD");
-      } catch (Exception ex) {
-         System.err.println("Invalid enviroment variables");
-      }
       SpringApplication.run(App.class, args);
    }
 
@@ -29,4 +23,14 @@ public class App extends SpringBootServletInitializer {
    protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
       return application.sources(App.class);
    }
+
+   @Bean
+   public CommandLineRunner schedulingRunner(TaskExecutor executor) {
+      return new CommandLineRunner() {
+         public void run(String... args) throws Exception {
+            executor.execute(MessageListener);
+         }
+      };
+   }
+
 }
