@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import de.plehr.Repository.EntryRepository;
 import de.plehr.Model.DataEntry;
-import de.plehr.Mqtt.MqttCommunicator;
+//import de.plehr.Mqtt.MqttCommunicator;
 
 @RestController
 @RequestMapping("/api")
@@ -25,7 +25,7 @@ public class ApiController {
 
     @RequestMapping("/set")
     String setCommand() throws MqttPersistenceException, MqttException {
-        new MqttCommunicator().sendMessage("helloooo", "Pascal");
+      //  new MqttCommunicator().sendMessage("helloooo", "Pascal");
         return "";
     }
 

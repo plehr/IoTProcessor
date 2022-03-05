@@ -16,8 +16,7 @@ public class FrontendController {
     private EntryRepository entryRepository;
 
     @GetMapping("/")
-    String firstPage(Model m) {
-        m.addAttribute("hello", "Helloo World!");
+    String firstPage() {
         return "firstPage";
     }
 
