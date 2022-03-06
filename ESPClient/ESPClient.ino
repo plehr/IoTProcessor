@@ -1,130 +1,118 @@
-#include <DHT.h>
-#include <WiFi.h>
-#include <PubSubClient.h>
-#include <Wire.h>
+#include <ArduinoMqttClient.h>
+#if defined(ARDUINO_SAMD_MKRWIFI1010) || defined(ARDUINO_SAMD_NANO_33_IOT) || defined(ARDUINO_AVR_UNO_WIFI_REV2)
+  #include <WiFiNINA.h>
+#elif defined(ARDUINO_SAMD_MKR1000)
+  #include <WiFi101.h>
+#elif defined(ARDUINO_ESP8266_ESP12)
+  #include <ESP8266WiFi.h>
+#endif
 
-#define DHTPIN 22 
+#include "arduino_secrets.h"
+char ssid[] = SECRET_SSID;
+char pass[] = SECRET_PASS;
 
-#define DHTTYPE DHT11
+// To connect with SSL/TLS:
+// 1) Change WiFiClient to WiFiSSLClient.
+// 2) Change port value from 1883 to 8883.
+// 3) Change broker value to a server with a known SSL/TLS root certificate 
+//    flashed in the WiFi module.
 
-const char* ssid = "SSID";
-const char* password = "PASSWD";
+WiFiClient wifiClient;
+MqttClient mqttClient(wifiClient);
 
-const char* mqtt_server = "BROKERURL";
-const char* mqtt_user = "USERNAME";
-const char* mqtt_pass = "PASSWD";
+const char broker[] = "URL";
+int        port     = 1883;
+byte mac_hw[6];
+String mac="??";
 
-DHT dht(DHTPIN, DHTTYPE);
+const long interval = 1000;
+unsigned long previousMillis = 0;
 
-WiFiClient espClient;
-PubSubClient client(espClient);
-long lastMsg = 0;
-char msg[50];
-int value = 0;
-
-const int ledPin = 23;
+int count = 0;
 
 void setup() {
-  Serial.begin(115200);
-
-  setup_wifi();
-  client.setServer(mqtt_server, 1883);
-  client.setCallback(callback);
-
-  pinMode(ledPin, OUTPUT);
-
-  Serial.println(F("DHTxx test!"));
-
-  dht.begin();
-}
-
-void setup_wifi() {
-  delay(10);
-  Serial.println();
-  Serial.print("Connecting to ");
-  Serial.println(ssid);
-
-  WiFi.begin(ssid, password);
-
-  while (WiFi.status() != WL_CONNECTED) {
-    delay(500);
-    Serial.print(".");
+  //Initialize serial and wait for port to open:
+  Serial.begin(9600);
+  while (!Serial) {
+    ; // wait for serial port to connect. Needed for native USB port only
   }
 
-  Serial.println("");
-  Serial.println("WiFi connected");
-  Serial.println("IP address: ");
-  Serial.println(WiFi.localIP());
-}
-
-void callback(char* topic, byte* message, unsigned int length) {
-  Serial.print("Message arrived on topic: ");
-  Serial.print(topic);
-  Serial.print(". Message: ");
-  String messageTemp;
+ String fv = WiFi.firmwareVersion();
+  if (fv < WIFI_FIRMWARE_LATEST_VERSION) {
+    Serial.println("Please upgrade the firmware");
+  }
+  WiFi.macAddress(mac_hw);
   
-  for (int i = 0; i < length; i++) {
-    Serial.print((char)message[i]);
-    messageTemp += (char)message[i];
+  // attempt to connect to WiFi network:
+  Serial.print("Attempting to connect to WPA SSID: ");
+  Serial.println(ssid);
+  while (WiFi.begin(ssid, pass) != WL_CONNECTED) {
+    // failed, retry
+    Serial.print(".");
+    delay(5000);
   }
+
+  Serial.println("You're connected to the network\nMAC:");
+  printMacAddress(mac_hw);
   Serial.println();
 
-  if (String(topic) == "esp32/output") {
-    Serial.print("Changing output to ");
-    if(messageTemp == "on"){
-      Serial.println("on");
-      digitalWrite(ledPin, HIGH);
-    }
-    else if(messageTemp == "off"){
-      Serial.println("off");
-      digitalWrite(ledPin, LOW);
-    }
-  }
-}
+  // You can provide a unique client ID, if not set the library uses Arduino-millis()
+  // Each client must have a unique client ID
+  // mqttClient.setId("clientId");
 
-void reconnect() {
-  while (!client.connected()) {
-    Serial.print("Attempting MQTT connection...");
-    if (client.connect("ESP", mqtt_user,mqtt_pass)) {
-      Serial.println("connected");
-      client.subscribe("esp32/output");
-    } else {
-      Serial.print("failed, rc=");
-      Serial.print(client.state());
-      Serial.println(" try again in 5 seconds");
-      delay(5000);
-    }
-  }
-}
+  // You can provide a username and password for authentication
+  mqttClient.setUsernamePassword(mac, "password");
 
+  Serial.print("Attempting to connect to the MQTT broker: ");
+  Serial.println(broker);
+
+  if (!mqttClient.connect(broker, port)) {
+    Serial.print("MQTT connection failed! Error code = ");
+    Serial.println(mqttClient.connectError());
+
+    while (1);
+  }
+
+  Serial.println("You're connected to the MQTT broker!");
+  Serial.println();
+}
 
 void loop() {
-  if (!client.connected()) {
-    reconnect();
-  }
-  client.loop();
+  // call poll() regularly to allow the library to send MQTT keep alives which
+  // avoids being disconnected by the broker
+  mqttClient.poll();
+
+  // to avoid having delays in loop, we'll use the strategy from BlinkWithoutDelay
+  // see: File -> Examples -> 02.Digital -> BlinkWithoutDelay for more info
+  unsigned long currentMillis = millis();
   
-  delay(2000);
+  if (currentMillis - previousMillis >= interval) {
+    // save the last time a message was sent
+    previousMillis = currentMillis;
 
-  float humidity = dht.readHumidity();
-  float temperature = dht.readTemperature();
-  float f = dht.readTemperature(true);
+    int sensorValue = analogRead(A0);
+    float voltage = sensorValue / 196.5;
 
-  if (isnan(humidity) || isnan(temperature) || isnan(f)) {
-    Serial.println(F("Failed to read from DHT sensor!"));
-    return;
+    Serial.print("Sending message to topic: ");
+    Serial.println(mac + "/voltage -> " + voltage);
+
+    // send message, the Print interface can be used to set the message contents
+    mqttClient.beginMessage(mac + "/voltage");
+    mqttClient.print(voltage);
+    mqttClient.endMessage();
+    Serial.println();
+    count++;
   }
-
-    char tempString[8];
-    dtostrf(temperature, 1, 2, tempString);
-    Serial.print("Temperature: ");
-    Serial.println(tempString);
-    client.publish("esp32/temperature", tempString);
-    
-    char humString[8];
-    dtostrf(humidity, 1, 2, humString);
-    Serial.print("Humidity: ");
-    Serial.println(humString);
-    client.publish("esp32/humidity", humString);
-  
+}
+void printMacAddress(byte mac[]) {
+  for (int i = 5; i >= 0; i--) {
+    if (mac[i] < 16) {
+      Serial.print("0");
+    }
+    Serial.print(mac[i], HEX);
+    if (i > 0) {
+      Serial.print(":");
+    }
+  }
+  Serial.println();
 }
