@@ -189,5 +189,9 @@ void loop() {
       Serial.print("HeatIndex: ");
       Serial.println(hifString);
       client.publish("00:00:00:00:00:00/heatindex", hifString);
+    
+      averageTemp = 0;
+      averageHumidity = 0;
+      averageHeatIndex = 0;
   }
 }
