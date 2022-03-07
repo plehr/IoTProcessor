@@ -20,7 +20,7 @@ const char* password = "";
 
 const char* mqtt_server = "HOST";
 const char* mqtt_user = "00:00:00:00:00:00";
-const char* mqtt_pass = "";
+const char* mqtt_pass = "egal :)";
 
 DHT dht(DHTPIN, DHTTYPE);
 
@@ -33,7 +33,7 @@ int value = 0;
 float temperatureAvg[10];
 float humidityAvg[10];
 float heatIndexAvg[10];
-int index = 0;
+int runIndex = 0;
 
 void setup() {
   Serial.begin(9600);
@@ -144,14 +144,14 @@ void loop() {
   float hic = dht.computeHeatIndex(temperature, humidity, false);
 
   //calculate average
-  temperatureAvg[index] = temperature;
-  humidityAvg[index] = humidity;
-  heatIndexAvg[index] = hic;
+  temperatureAvg[runIndex] = temperature;
+  humidityAvg[runIndex] = humidity;
+  heatIndexAvg[runIndex] = hic;
   
-  index += 1;
+  runIndex += 1;
 
-  if (index > 9) {
-      index  = 0;
+  if (runIndex > 9) {
+      runIndex  = 0;
       float averageTemp; 
       for(int i = 0; i < 10; i++) {
           averageTemp += temperatureAvg[i];
