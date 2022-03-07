@@ -25,6 +25,16 @@ public class ApiController {
         return entryRepository.findAll();
     }
 
+    @RequestMapping(value="/source/{source}", method=RequestMethod.GET)
+    public List<DataEntry> getSourceFilterValues(@PathVariable("source") String source) {
+        return entryRepository.findBySource(source);
+    }
+
+    @RequestMapping(value="/topic/{topic}", method=RequestMethod.GET)
+    public List<DataEntry> getTopicFilterValues(@PathVariable("topic") String topic) {
+        return entryRepository.findByTopic(topic);
+    }
+
     @RequestMapping(value="/source/{source}/interval/{interval}", method = RequestMethod.POST)
     String setInterval(@PathVariable("source") String source,@PathVariable("interval") int interval) throws MqttPersistenceException, MqttException {
         new MqttCommunicator().sendMessage(source+"/setInterval", interval+"");
