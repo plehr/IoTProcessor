@@ -1,118 +1,164 @@
-#include <ArduinoMqttClient.h>
-#if defined(ARDUINO_SAMD_MKRWIFI1010) || defined(ARDUINO_SAMD_NANO_33_IOT) || defined(ARDUINO_AVR_UNO_WIFI_REV2)
-  #include <WiFiNINA.h>
-#elif defined(ARDUINO_SAMD_MKR1000)
-  #include <WiFi101.h>
-#elif defined(ARDUINO_ESP8266_ESP12)
-  #include <ESP8266WiFi.h>
-#endif
+// Example testing sketch for various DHT humidity/temperature sensors written by ladyada
+// REQUIRES the following Arduino libraries:
+// - DHT Sensor Library: https://github.com/adafruit/DHT-sensor-library
+// - Adafruit Unified Sensor Lib: https://github.com/adafruit/Adafruit_Sensor
 
-#include "arduino_secrets.h"
-char ssid[] = SECRET_SSID;
-char pass[] = SECRET_PASS;
+#include "DHT.h"
+#include <WiFi.h>
+#include <PubSubClient.h>
+#include <Wire.h>
 
-// To connect with SSL/TLS:
-// 1) Change WiFiClient to WiFiSSLClient.
-// 2) Change port value from 1883 to 8883.
-// 3) Change broker value to a server with a known SSL/TLS root certificate 
-//    flashed in the WiFi module.
+#define DHTPIN 23     // Digital pin connected to the DHT sensor
+// Feather HUZZAH ESP8266 note: use pins 3, 4, 5, 12, 13 or 14 --
+// Pin 15 can work but DHT must be disconnected during program upload.
 
-WiFiClient wifiClient;
-MqttClient mqttClient(wifiClient);
+// Uncomment whatever type you're using!
+#define DHTTYPE DHT11   // DHT 11
 
-const char broker[] = "URL";
-int        port     = 1883;
-byte mac_hw[6];
-String mac="??";
+const char* ssid = "";
+const char* password = "";
 
-const long interval = 1000;
-unsigned long previousMillis = 0;
+const char* mqtt_server = "HOST";
+const char* mqtt_user = "00:00:00:00:00:00";
+const char* mqtt_pass = "";
 
-int count = 0;
+DHT dht(DHTPIN, DHTTYPE);
+
+WiFiClient espClient;
+PubSubClient client(espClient);
+long lastMsg = 0;
+char msg[50];
+int value = 0;
 
 void setup() {
-  //Initialize serial and wait for port to open:
   Serial.begin(9600);
-  while (!Serial) {
-    ; // wait for serial port to connect. Needed for native USB port only
-  }
+  Serial.println(F("DHTxx test!"));
 
- String fv = WiFi.firmwareVersion();
-  if (fv < WIFI_FIRMWARE_LATEST_VERSION) {
-    Serial.println("Please upgrade the firmware");
-  }
-  WiFi.macAddress(mac_hw);
-  
-  // attempt to connect to WiFi network:
-  Serial.print("Attempting to connect to WPA SSID: ");
+ setup_wifi();
+  client.setServer(mqtt_server, 1883);
+  client.setCallback(callback);
+
+  Serial.println(F("DHTxx test!"));
+
+  dht.begin();
+}
+
+void setup_wifi() {
+  delay(10);
+  // We start by connecting to a WiFi network
+  Serial.println();
+  Serial.print("Connecting to ");
   Serial.println(ssid);
-  while (WiFi.begin(ssid, pass) != WL_CONNECTED) {
-    // failed, retry
+
+  WiFi.begin(ssid, password);
+
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
     Serial.print(".");
-    delay(5000);
   }
 
-  Serial.println("You're connected to the network\nMAC:");
-  printMacAddress(mac_hw);
-  Serial.println();
+  Serial.println("");
+  Serial.println("WiFi connected");
+  Serial.println("IP address: ");
+  Serial.println(WiFi.localIP());
+}
 
-  // You can provide a unique client ID, if not set the library uses Arduino-millis()
-  // Each client must have a unique client ID
-  // mqttClient.setId("clientId");
-
-  // You can provide a username and password for authentication
-  mqttClient.setUsernamePassword(mac, "password");
-
-  Serial.print("Attempting to connect to the MQTT broker: ");
-  Serial.println(broker);
-
-  if (!mqttClient.connect(broker, port)) {
-    Serial.print("MQTT connection failed! Error code = ");
-    Serial.println(mqttClient.connectError());
-
-    while (1);
+void reconnect() {
+  // Loop until we're reconnected
+  while (!client.connected()) {
+    Serial.print("Attempting MQTT connection...");
+    // Attempt to connect
+    if (client.connect("ESP", mqtt_user,mqtt_pass)) {
+      Serial.println("connected");
+      // Subscribe
+      client.subscribe("00:00:00:00:00:00/output");
+    } else {
+      Serial.print("failed, rc=");
+      Serial.print(client.state());
+      Serial.println(" try again in 5 seconds");
+      // Wait 5 seconds before retrying
+      delay(5000);
+    }
   }
+}
 
-  Serial.println("You're connected to the MQTT broker!");
+void callback(char* topic, byte* message, unsigned int length) {
+  Serial.print("Message arrived on topic: ");
+  Serial.print(topic);
+  Serial.print(". Message: ");
+  String messageTemp;
+  
+  for (int i = 0; i < length; i++) {
+    Serial.print((char)message[i]);
+    messageTemp += (char)message[i];
+  }
   Serial.println();
+
+  // Feel free to add more if statements to control more GPIOs with MQTT
+
+  // If a message is received on the topic esp32/output, you check if the message is either "on" or "off". 
+  // Changes the output state according to the message
+  if (String(topic) == "esp32/output") {
+    Serial.print("Changing output to ");
+    if(messageTemp == "on"){
+      Serial.println("on");
+    }
+    else if(messageTemp == "off"){
+      Serial.println("off");
+    }
+  }
 }
 
 void loop() {
-  // call poll() regularly to allow the library to send MQTT keep alives which
-  // avoids being disconnected by the broker
-  mqttClient.poll();
-
-  // to avoid having delays in loop, we'll use the strategy from BlinkWithoutDelay
-  // see: File -> Examples -> 02.Digital -> BlinkWithoutDelay for more info
-  unsigned long currentMillis = millis();
+  if (!client.connected()) {
+    reconnect();
+  }
+  client.loop();
   
-  if (currentMillis - previousMillis >= interval) {
-    // save the last time a message was sent
-    previousMillis = currentMillis;
+  // Wait a few seconds between measurements.
+  delay(2000);
 
-    int sensorValue = analogRead(A0);
-    float voltage = sensorValue / 196.5;
+  // Reading temperature or humidity takes about 250 milliseconds!
+  // Sensor readings may also be up to 2 seconds 'old' (its a very slow sensor)
+  float humidity = dht.readHumidity();
+  // Read temperature as Celsius (the default)
+  float temperature = dht.readTemperature();
+  // Read temperature as Fahrenheit (isFahrenheit = true)
+  float f = dht.readTemperature(true);
 
-    Serial.print("Sending message to topic: ");
-    Serial.println(mac + "/voltage -> " + voltage);
 
-    // send message, the Print interface can be used to set the message contents
-    mqttClient.beginMessage(mac + "/voltage");
-    mqttClient.print(voltage);
-    mqttClient.endMessage();
-    Serial.println();
-    count++;
+  // Check if any reads failed and exit early (to try again).
+  if (isnan(humidity) || isnan(temperature) || isnan(f)) {
+    Serial.println(F("Failed to read from DHT sensor!"));
+    return;
   }
-}
-void printMacAddress(byte mac[]) {
-  for (int i = 5; i >= 0; i--) {
-    if (mac[i] < 16) {
-      Serial.print("0");
-    }
-    Serial.print(mac[i], HEX);
-    if (i > 0) {
-      Serial.print(":");
-    }
-  }
-  Serial.println();
+
+  // Compute heat index in Fahrenheit (the default)
+  float hif = dht.computeHeatIndex(f, humidity);
+  // Compute heat index in Celsius (isFahreheit = false)
+  float hic = dht.computeHeatIndex(temperature, humidity, false);
+
+    //publish measurements
+
+    // temperature
+    char tempString[8];
+    dtostrf(temperature, 1, 2, tempString);
+    Serial.print("Temperature: ");
+    Serial.println(tempString);
+    client.publish("00:00:00:00:00:00/temperature", tempString);
+    
+    // humidity
+    char humString[8];
+    dtostrf(humidity, 1, 2, humString);
+    Serial.print("Humidity: ");
+    Serial.println(humString);
+    client.publish("00:00:00:00:00:00/humidity", humString);
+
+
+    // HeatIndex
+    char hifString[8];
+    dtostrf(hif, 1, 2, hifString);
+    Serial.print("HeatIndex: ");
+    Serial.println(hifString);
+    client.publish("00:00:00:00:00:00/heatindex", hifString);
 }
