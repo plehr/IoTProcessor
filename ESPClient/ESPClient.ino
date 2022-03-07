@@ -30,6 +30,11 @@ long lastMsg = 0;
 char msg[50];
 int value = 0;
 
+float temperatureAvg[10];
+float humidityAvg[10];
+float heatIndexAvg[10];
+int index = 0;
+
 void setup() {
   Serial.begin(9600);
   Serial.println(F("DHTxx test!"));
@@ -87,7 +92,7 @@ void callback(char* topic, byte* message, unsigned int length) {
   Serial.print(topic);
   Serial.print(". Message: ");
   String messageTemp;
-  
+
   for (int i = 0; i < length; i++) {
     Serial.print((char)message[i]);
     messageTemp += (char)message[i];
@@ -96,7 +101,7 @@ void callback(char* topic, byte* message, unsigned int length) {
 
   // Feel free to add more if statements to control more GPIOs with MQTT
 
-  // If a message is received on the topic esp32/output, you check if the message is either "on" or "off". 
+  // If a message is received on the topic esp32/output, you check if the message is either "on" or "off".
   // Changes the output state according to the message
   if (String(topic) == "esp32/output") {
     Serial.print("Changing output to ");
@@ -114,7 +119,7 @@ void loop() {
     reconnect();
   }
   client.loop();
-  
+
   // Wait a few seconds between measurements.
   delay(2000);
 
@@ -138,27 +143,51 @@ void loop() {
   // Compute heat index in Celsius (isFahreheit = false)
   float hic = dht.computeHeatIndex(temperature, humidity, false);
 
-    //publish measurements
+  //calculate average
+  temperatureAvg[index] = temperature;
+  humidityAvg[index] = humidity;
+  heatIndexAvg[index] = hic;
+  
+  index += 1;
 
-    // temperature
-    char tempString[8];
-    dtostrf(temperature, 1, 2, tempString);
-    Serial.print("Temperature: ");
-    Serial.println(tempString);
-    client.publish("00:00:00:00:00:00/temperature", tempString);
-    
-    // humidity
-    char humString[8];
-    dtostrf(humidity, 1, 2, humString);
-    Serial.print("Humidity: ");
-    Serial.println(humString);
-    client.publish("00:00:00:00:00:00/humidity", humString);
+  if (index > 9) {
+      index  = 0;
+      float averageTemp; 
+      for(int i = 0; i < 10; i++) {
+          averageTemp += temperatureAvg[i];
+      }
+      averageTemp = averageTemp / 10;
 
+      float averageHumidity; 
+      for(int i = 0; i < 10; i++) {
+          averageHumidity += humidityAvg[i];
+      }
+      averageHumidity = averageHumidity / 10;
 
-    // HeatIndex
-    char hifString[8];
-    dtostrf(hif, 1, 2, hifString);
-    Serial.print("HeatIndex: ");
-    Serial.println(hifString);
-    client.publish("00:00:00:00:00:00/heatindex", hifString);
+      float averageHeatIndex; 
+      for(int i = 0; i < 10; i++) {
+          averageHeatIndex += heatIndexAvg[i];
+      }
+      averageHeatIndex = averageHeatIndex / 10;
+
+      char tempString[8];
+      dtostrf(averageTemp, 1, 2, tempString);
+      Serial.print("Temperature: ");
+      Serial.println(tempString);
+      client.publish("00:00:00:00:00:00/temperature", tempString);
+
+      // humidity
+      char humString[8];
+      dtostrf(averageHumidity, 1, 2, humString);
+      Serial.print("Humidity: ");
+      Serial.println(humString);
+      client.publish("00:00:00:00:00:00/humidity", humString);
+
+      // HeatIndex
+      char hifString[8];
+      dtostrf(averageHeatIndex, 1, 2, hifString);
+      Serial.print("HeatIndex: ");
+      Serial.println(hifString);
+      client.publish("00:00:00:00:00:00/heatindex", hifString);
+  }
 }
