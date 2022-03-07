@@ -1,19 +1,12 @@
-// Example testing sketch for various DHT humidity/temperature sensors written by ladyada
-// REQUIRES the following Arduino libraries:
-// - DHT Sensor Library: https://github.com/adafruit/DHT-sensor-library
-// - Adafruit Unified Sensor Lib: https://github.com/adafruit/Adafruit_Sensor
-
 #include "DHT.h"
 #include <WiFi.h>
 #include <PubSubClient.h>
 #include <Wire.h>
 
-#define DHTPIN 23     // Digital pin connected to the DHT sensor
-// Feather HUZZAH ESP8266 note: use pins 3, 4, 5, 12, 13 or 14 --
-// Pin 15 can work but DHT must be disconnected during program upload.
+#define DHTPIN 23
 
-// Uncomment whatever type you're using!
-#define DHTTYPE DHT11   // DHT 11
+
+#define DHTTYPE DHT11
 
 const char* ssid = "";
 const char* password = "";
@@ -50,7 +43,6 @@ void setup() {
 
 void setup_wifi() {
   delay(10);
-  // We start by connecting to a WiFi network
   Serial.println();
   Serial.print("Connecting to ");
   Serial.println(ssid);
@@ -69,19 +61,16 @@ void setup_wifi() {
 }
 
 void reconnect() {
-  // Loop until we're reconnected
   while (!client.connected()) {
     Serial.print("Attempting MQTT connection...");
-    // Attempt to connect
+
     if (client.connect("ESP", mqtt_user,mqtt_pass)) {
       Serial.println("connected");
-      // Subscribe
       client.subscribe("00:00:00:00:00:00/output");
     } else {
       Serial.print("failed, rc=");
       Serial.print(client.state());
       Serial.println(" try again in 5 seconds");
-      // Wait 5 seconds before retrying
       delay(5000);
     }
   }
@@ -99,10 +88,6 @@ void callback(char* topic, byte* message, unsigned int length) {
   }
   Serial.println();
 
-  // Feel free to add more if statements to control more GPIOs with MQTT
-
-  // If a message is received on the topic esp32/output, you check if the message is either "on" or "off".
-  // Changes the output state according to the message
   if (String(topic) == "esp32/output") {
     Serial.print("Changing output to ");
     if(messageTemp == "on"){
@@ -120,19 +105,14 @@ void loop() {
   }
   client.loop();
 
-  // Wait a few seconds between measurements.
   delay(2000);
 
-  // Reading temperature or humidity takes about 250 milliseconds!
-  // Sensor readings may also be up to 2 seconds 'old' (its a very slow sensor)
   float humidity = dht.readHumidity();
-  // Read temperature as Celsius (the default)
+  // Read temperature as Celsius
   float temperature = dht.readTemperature();
-  // Read temperature as Fahrenheit (isFahrenheit = true)
+  // Read temperature as Fahrenheit
   float f = dht.readTemperature(true);
 
-
-  // Check if any reads failed and exit early (to try again).
   if (isnan(humidity) || isnan(temperature) || isnan(f)) {
     Serial.println(F("Failed to read from DHT sensor!"));
     return;
@@ -170,13 +150,14 @@ void loop() {
       }
       averageHeatIndex = averageHeatIndex / 10;
 
+      // Temperature
       char tempString[8];
       dtostrf(averageTemp, 1, 2, tempString);
       Serial.print("Temperature: ");
       Serial.println(tempString);
       client.publish("00:00:00:00:00:00/temperature", tempString);
 
-      // humidity
+      // Humidity
       char humString[8];
       dtostrf(averageHumidity, 1, 2, humString);
       Serial.print("Humidity: ");
