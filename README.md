@@ -30,6 +30,7 @@ The filter is applied to the database and not on server. You can see on this dia
 
 ## Database
 We use a postgres database to store data. This database is connected with hibernate and we don't have to do manual database queries. This is our schema:
+
 ![Database](docs/database.png)
 
 ## Notice
