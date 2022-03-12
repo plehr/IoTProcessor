@@ -21,15 +21,15 @@ We connected out client with the sensor on an breadboard. On this picture we use
 ![Fritzing](docs/breadboard_overview.png)
 
 ## Sequence Diagram
-The connection between client and server use a mqtt broker from stackhero. This broker provides the possibility that the broker ask our api for every action. We implemented with the documentation the routes for stackhero to handle authentification. On this picture you can see how it works:
+The connection between client and server uses a mqtt broker from stackhero. This broker provides the possibility that the broker asks our api for every action. We implemented with the documentation the routes for stackhero to handle authentification. On this picture you can see how it works:
 ![ClientESP](docs/sequence-esp.png)
-Here you can see how the connection between the client and our server and database is working.
+Here you can see how the connection between the client, our server and database is working.
 We can also ask the server for data. There are two implemented ways to ask for data: all data or filtered data.
-The filter is applied to the database and not on server. You can see on this diagram hot it works:
+The filter is applied to the database and not on server. You can see on this diagram how it works:
 ![ClientBrowser](docs/sequence-browser.png)
 
 ## Database
-We use a postgres database to store data. This database is connected with hibernate and we don't have to do manual database queries. This is our schema:
+We use a postgres database to store data. This database is connected with hibernate and we don't have to do manual database queries. This is our scheme:
 
 ![Database](docs/database.png)
 
