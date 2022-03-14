@@ -132,19 +132,19 @@ void loop() {
 
   if (runIndex > 9) {
       runIndex  = 0;
-      float averageTemp; 
+      float averageTemp=0; 
       for(int i = 0; i < 10; i++) {
           averageTemp += temperatureAvg[i];
       }
       averageTemp = averageTemp / 10;
 
-      float averageHumidity; 
+      float averageHumidity=0; 
       for(int i = 0; i < 10; i++) {
           averageHumidity += humidityAvg[i];
       }
       averageHumidity = averageHumidity / 10;
 
-      float averageHeatIndex; 
+      float averageHeatIndex=0; 
       for(int i = 0; i < 10; i++) {
           averageHeatIndex += heatIndexAvg[i];
       }
@@ -170,9 +170,5 @@ void loop() {
       Serial.print("HeatIndex: ");
       Serial.println(hifString);
       client.publish("00:00:00:00:00:00/heatindex", hifString);
-    
-      averageTemp = 0;
-      averageHumidity = 0;
-      averageHeatIndex = 0;
   }
 }
