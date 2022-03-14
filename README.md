@@ -17,15 +17,15 @@ Access the API documentation with the following path: /swagger-ui/index.html
 ![LabPicture](docs/labpicture.jpg)
 
 ## Connect the client
-We connected out client with the sensor on an breadboard. On this picture we used a ESP32 microcontroller (NodeMCU-32S ESP32):
+We connected out client with the sensor on an breadboard. On this picture we used a ESP32 microcontroller (NodeMCU-32S ESP32), a DHT11 sensor and a 10k Ohm resistor:
 ![Fritzing](docs/breadboard_overview.png)
 
 ## Sequence Diagram
-The connection between client and server uses a mqtt broker from stackhero. This broker provides the possibility that the broker asks our api for every action. We implemented with the documentation the routes for stackhero to handle authentification. On this picture you can see how it works:
+The connection between client and server uses a mqtt broker from stackhero. This broker provides the function that the broker needs to ask our api for permission before every action. On the basis of a stackhero [documentation](https://www.stackhero.io/en/services/Mosquitto/documentations/Authentication-of-devices#authenticate-mqtt-users-using-an-api) we implemented routes to enable the broker to communicate with our api. On this picture you can see how it works:
 ![ClientESP](docs/sequence-esp.png)
 Here you can see how the connection between the client, our server and database is working.
-We can also ask the server for data. There are two implemented ways to ask for data: all data or filtered data.
-The filter is applied to the database and not on server. You can see on this diagram how it works:
+We can also request data from the server. There are two implemented ways to request data: all data or filtered data.
+The filter is applied to the database and not on the server. You can see on this diagram how it works:
 ![ClientBrowser](docs/sequence-browser.png)
 
 ## Database
